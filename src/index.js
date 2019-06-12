@@ -1,6 +1,9 @@
+const path = require("path");
 const express = require("express");
 const app = express();
 
-app.listen(process.env.PORT, () => {
+const port = process.env.PORT || 3000
+
+app.listen(port, () => {
     console.log(`listening to env PORT`)
 })
