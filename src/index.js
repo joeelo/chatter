@@ -1,9 +1,25 @@
 const path = require("path");
-const express = require("express");
-const app = express();
+const publicDirectoryPath = path.join(__dirname, "../public");
 
-const port = process.env.PORT || 3000
+let express = require('express');
+let app = express();
+let http = require("http");
+let server = http.createServer(app)
+let socketio = require('socket.io');
+let io = socketio(server);
+app.use(express.static(publicDirectoryPath));
 
-app.listen(port, () => {
-    console.log(`listening to env PORT`)
+io.on("connection", (socket) => {
+    const message = "You're gonna do great things";
+    socket.emit("message", message);
+
+    socket.on("sendMessage", (inputValue) => {
+        io.emit("message", inputValue);
+    })
+   
 })
+
+server.listen(3000, function(){
+    console.log('listening on *:3000');
+});
+
