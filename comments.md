@@ -70,5 +70,17 @@ io.on('connection', (socket) => {
         count++;
         io.emit("countUpdated", count);
     })
+
+    socket.on("disconnect)
 });
+
+The disconnect method is one that is native to websockets, and naturally it is when a use disconnects.
+There is no main on like there is for io, and disconnect must be inside the on connection function
+only removing one particular socket.
+
+Check documentation from Geolocation API from browsers
+is native, non async so it does take time. Up to 3-5 seconds at times.
+User must consent to sharing location. 
+Must be passed with a parameter of position
+navigator.geolocation.getCurrentPosition
 
