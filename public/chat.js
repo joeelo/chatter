@@ -31,8 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         locBtn.setAttribute("disabled", "disabled")
         
         navigator.geolocation.getCurrentPosition((position) => {
-            positionObj = {latitude: position.coords.latitude, longitude: position.coords.longitude};
-            console.log(positionObj);
+            let positionObj = {latitude: position.coords.latitude, longitude: position.coords.longitude};
 
             socket.emit("sendLocation", positionObj, (error) => {
                 if(error) {
@@ -45,7 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     
     socket.on("message", (message) => {
-        ul.innerHTML += `<li> ${message} </li>`
+        ul.innerHTML += `<li>${message.createdAt} - ${message.text} </li>`
+    })
+
+    socket.on("locationMessage", (mapLocation) => {
+        ul.innerHTML += `<a href=${mapLocation} target="_blank"> My current location </a>`
     })
 })
 

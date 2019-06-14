@@ -8,12 +8,13 @@ const socketio = require('socket.io');
 const io = socketio(server);
 const Filter = require("bad-words");
 app.use(express.static(publicDirectoryPath));
+const { generateMessage } = require("./utils/message");
 
 io.on("connection", (socket) => {
     const message = "You're gonna do great things";
-    socket.emit("message", message);
-    socket.broadcast.emit("message", "A new user has joined!");
-
+    socket.emit("message", generateMessage(message));
+    socket.broadcast.emit("message", generateMessage("A new user has joined!"));
+    
     socket.on("sendMessage", (inputValue, callback) => {
         const filter = new Filter();
 
@@ -21,20 +22,21 @@ io.on("connection", (socket) => {
             return callback("Profanity is not allowed");
         }
 
-        io.emit("message", inputValue);
+        io.emit("message", generateMessage(inputValue));
         callback();
     })
 
     socket.on("sendLocation", (positionObj, callback) => {
-        mapLocation = `https://google.com/maps?q=${positionObj.latitude},${positionObj.longitude}`
+        let mapLocation = `https://google.com/maps?q=${positionObj.latitude},${positionObj.longitude}`
+
         console.log(mapLocation);
-        io.emit("message", (mapLocation));
+        io.emit("locationMessage", (mapLocation));
 
         callback();
     })
 
     socket.on("disconnect", () => {
-        io.emit("message", "A user has left!")
+        io.emit("message", generateMessage("A user has left!"))
     })
    
 })
