@@ -1,7 +1,7 @@
 let socket = io();
 
 document.addEventListener("DOMContentLoaded", () => {
-    const ul = document.getElementById("chat-list");
+    const messageDiv = document.getElementById("chat-messages");
     const form = document.getElementById("form");
     const locBtn = document.getElementById("send-location");
     const formBtn = document.getElementById("form-button");
@@ -28,27 +28,33 @@ document.addEventListener("DOMContentLoaded", () => {
         if( !navigator.geolocation ) {
             return alert("Geolocation not supported by your browser.")
         }
-        locBtn.setAttribute("disabled", "disabled")
-        
-        navigator.geolocation.getCurrentPosition((position) => {
-            let positionObj = {latitude: position.coords.latitude, longitude: position.coords.longitude};
-
+        // locBtn.setAttribute("disabled", "disabled")
+        const success = (position) => {
+            const positionObj = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+            console.log("clicked")
+            
             socket.emit("sendLocation", positionObj, (error) => {
                 if(error) {
-                    return alert("Something went wrong");
+                    return alert({error});
                 }
-                locBtn.removeAttribute("disabled");
+                // locBtn.removeAttribute("disabled");
                 console.log("Location sent")
             });
-        })
+        }
+        const errorHandler = () => {
+            return alert("semething went wrong!");
+        }
+        const options = {enableHighAccuracy: true, maximumAge: Infinity, timeout: 5000};
+
+        navigator.geolocation.getCurrentPosition(success, errorHandler, options);
     })
     
     socket.on("message", (message) => {
-        ul.innerHTML += `<li>${message.createdAt} - ${message.text} </li>`
+        messageDiv.innerHTML += `<div class="message">${message.createdAt} - ${message.text} </div>`
     })
 
-    socket.on("locationMessage", (mapLocation) => {
-        ul.innerHTML += `<a href=${mapLocation} target="_blank"> My current location </a>`
+    socket.on("locationMessage", (mapLocationObj) => {
+        messageDiv.innerHTML += `<span>${mapLocationObj.createdAt}</span> <a href=${mapLocationObj.url} target="_blank"> My current location </a>`
     })
 })
 

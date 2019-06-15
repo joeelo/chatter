@@ -9,6 +9,16 @@ const generateMessage = (text) => {
     }
 }
 
+const generateLocationMessage = (url) => {
+    const date = new Date();
+    const now = moment(date).calendar();
+    return {
+        url: url, 
+        createdAt: now
+    }
+}
+
 module.exports = {
-    generateMessage: generateMessage
+    generateMessage: generateMessage,
+    generateLocationMessage: generateLocationMessage
 }
