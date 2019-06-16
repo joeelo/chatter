@@ -12,10 +12,13 @@ const { generateMessage, generateLocationMessage } = require("./utils/message");
 const moment = require("moment");
 
 io.on("connection", (socket) => {
-    const message = "You're gonna do great things";
-    socket.emit("message", generateMessage(message));
-    socket.broadcast.emit("message", generateMessage("A new user has joined!"));
     
+    socket.on("join", ({username, room}) => {
+        socket.emit("message", generateMessage("You're gonna do great things"));
+        socket.broadcast.to(room).emit("message", generateMessage(`${username} has joined!`));    
+        socket.join(room)
+    })
+
     socket.on("sendMessage", (inputValue, callback) => {
         const filter = new Filter();
 
@@ -23,20 +26,20 @@ io.on("connection", (socket) => {
             return callback("Profanity is not allowed");
         }
 
-        io.emit("message", generateMessage(inputValue));
+        io.to("my room").emit("message", generateMessage(inputValue));
         callback();
     })
 
     socket.on("sendLocation", (positionObj, callback) => {
         let mapLocation = `https://google.com/maps?q=${positionObj.latitude},${positionObj.longitude}`
         console.log(generateLocationMessage(mapLocation));
-        io.emit("locationMessage", generateLocationMessage(mapLocation));
+        io.to("my room").emit("locationMessage", generateLocationMessage(mapLocation));
 
         callback();
     })
 
     socket.on("disconnect", () => {
-        io.emit("message", generateMessage("A user has left!"))
+        io.to("my room").emit("message", generateMessage("A user has left!"))
     })
    
 })
