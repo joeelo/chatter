@@ -5,11 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("form");
     const locBtn = document.getElementById("send-location");
     const formBtn = document.getElementById("form-button");
+    const sideBar = document.getElementById("chat-sidebar");
 
     const {username, room} = Qs.parse(location.search, { ignoreQueryPrefix: true});
 
-    socket.emit("join", { username, room })
-    console.log({username, room})
+    // console.log({username, room})
 
     form.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if( !navigator.geolocation ) {
             return alert("Geolocation not supported by your browser.")
         }
-        locBtn.setAttribute("disabled", "disabled")
+        // locBtn.setAttribute("disabled", "disabled")
         const success = (position) => {
             const positionObj = {latitude: position.coords.latitude, longitude: position.coords.longitude};
             console.log("clicked")
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if(error) {
                     return alert({error});
                 }
-                locBtn.removeAttribute("disabled");
+                // locBtn.removeAttribute("disabled");
                 console.log("Location sent")
             });
         }
@@ -53,18 +53,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
         navigator.geolocation.getCurrentPosition(success, errorHandler, options);
     })
+
     
     socket.on("message", (message) => {
         const div = document.createElement("div");
         div.classList.add("message");
-
-        div.innerHTML += `<p>Some Username ${message.createdAt}</p><p>${message.text}</p>`;
+        div.innerHTML += `<p>${message.username} ${message.createdAt}</p><p>${message.text}</p>`;
         messageDiv.append(div);
         // messageDiv.innerHTML += `<div class="message">${message.createdAt} - ${message.text} </div>`
     })
 
     socket.on("locationMessage", (mapLocationObj) => {
-        messageDiv.innerHTML += `<span>${mapLocationObj.createdAt}</span> <a href=${mapLocationObj.url} target="_blank"> My current location </a>`
+        console.log(mapLocationObj);
+        messageDiv.innerHTML += `<p>${mapLocationObj.username} ${mapLocationObj.createdAt}</p> <a href=${mapLocationObj.url} target="_blank"> My current location </a>`
+    })
+
+    socket.emit("join", { username, room }, (error) => {
+        if (error) {
+            alert(error);
+            location.href = "/";
+        }
+    })
+
+    socket.on("roomData", ({room, users}) => {
+        console.log(users);
+        const renderUsers = users.map(user => `<p> ${user.username} </p>` )
+        sideBar.innerHTML = 
+        `
+            <h1>${room}</h1>
+            <h2> Users </h2><br>
+            ${renderUsers.join("")}
+        `
     })
 
 })

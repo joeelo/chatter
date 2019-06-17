@@ -1,14 +1,9 @@
 const users = [];
-const fauxUser = {id: 1, username: "Joe lorenzo", room: 3000};
-const fauxUser2 = {id: 2, username: "Joe", room: 3000};
-
 
 // addUser, removeUser, getUser, getUsersInRoom
 
 const addUser = (userObj) => {
     let { id, username, room } = userObj;
-    username = username.trim().toLowerCase();
-    console.log(username)
     if (!username || !room) {
         return {error: "username and room are required"};
     }
@@ -23,8 +18,8 @@ const addUser = (userObj) => {
     return { user };
 }
 
-const removeUser = (userObj) => {
-    const index = users.findIndex(user => user.id === userObj.id);
+const removeUser = (id) => {
+    const index = users.findIndex(user => user.id === id);
 
     if (index !== -1) {
         return users.splice(index, 1)[0];
@@ -32,11 +27,21 @@ const removeUser = (userObj) => {
 
 }
 
-addUser(fauxUser);
-addUser(fauxUser2);
-console.log(users);
-const removedUser = removeUser(fauxUser);
-console.log(removedUser);
-console.log(users);
+const getUser = (id) => {
+    return users.find(user => user.id === id);
+}
+
+const getUsersInRoom = (room) => {
+    const roomUsers = users.filter(user => room === user.room);
+    return roomUsers;
+}
+
+module.exports = {
+    addUser,
+    removeUser,
+    getUser,
+    getUsersInRoom
+}
+
 
 

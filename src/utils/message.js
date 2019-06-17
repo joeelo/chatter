@@ -1,18 +1,20 @@
 const moment = require("moment");
 
-const generateMessage = (text) => {
+const generateMessage = (username, text) => {
     const date = new Date();
     const now = moment(date).calendar();
     return {
+        username: username,
         text: text,
         createdAt: now
     }
 }
 
-const generateLocationMessage = (url) => {
+const generateLocationMessage = (username, url) => {
     const date = new Date();
     const now = moment(date).calendar();
     return {
+        username: username,
         url: url, 
         createdAt: now
     }
